@@ -1,0 +1,69 @@
+name: Node.js Continuous Delivery
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+
+  # STEP 1: Build, Test and Package
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Package build artifact
+        run: |
+          mkdir -p dist
+          cp package.json index.js dist/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-package
+          path: dist/
+
+  # STEP 2: Deploy to Staging
+  deploy-staging:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-package
+          path: dist/
+
+      - name: Deploy to Staging
+        run: echo "Deploying to Staging environment..."
+
+  # STEP 3: Deploy to Production
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-package
+          path: dist/
+
+      - name: Deploy to Production
+        run: echo "Deploying to Production environment..."

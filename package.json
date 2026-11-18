@@ -1,0 +1,9 @@
+{
+  "name": "nodejs-continuous-delivery",
+  "version": "1.0.0",
+  "description": "Node.js Continuous Delivery Practical",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Tests passed successfully\""
+  }
+}
